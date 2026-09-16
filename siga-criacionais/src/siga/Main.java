@@ -21,9 +21,14 @@ public class Main {
         AcessoDados acessoPostgreSQL = new AcessoDados(new FabricaPostgreSQL());
         acessoPostgreSQL.conectar();
         System.out.println();
-        
-        String consulta = acessoMySQL.montarConsulta("aluno", "curso = 'DSM'", "nome",
-                50, 0, 30, true);
+
+        String consulta = new ConsultaBuilder("aluno")
+                .comFiltro("curso = 'DSM'")
+                .comOrdenacao("nome")
+                .comLimite(50)
+                .comOffset(0)
+                .comSomenteAtivos(true)
+                .construir();
         System.out.println("Consulta montada: " + consulta);
     }
 }
