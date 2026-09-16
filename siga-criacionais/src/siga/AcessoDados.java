@@ -1,13 +1,6 @@
 package siga;
 
 /**
- * Código INICIAL da atividade — contém os problemas PROPOSITAIS a refatorar.
- *
- * PROBLEMA 1 — mistura de fornecedores (falta Abstract Factory):
- * o método conectar escolhe conexão e comando por condicionais e "new"
- * separados, sem nada que garanta que ambos sejam do MESMO fornecedor. É
- * possível, por engano, abrir uma conexão MySQL e criar um comando PostgreSQL
- * — uma combinação que quebra em tempo de execução.
  *
  * PROBLEMA 2 — construtor telescópico (falta Builder):
  * a configuração de uma consulta é passada por um método com muitos parâmetros
@@ -26,24 +19,18 @@ package siga;
  *   - Etapa 4: transformar o AcessoDados em um Singleton.
  */
 public class AcessoDados {
+    private final FabricaBanco fabrica;
 
-    // PROBLEMA 1: conexão e comando criados separadamente, sem garantia de coerência.
-    public void conectar(String fornecedor) {
-        Conexao conexao;
-        Comando comando;
-        if (fornecedor.equals("MYSQL")) {
-            conexao = new ConexaoMySQL();
-            comando = new ComandoMySQL();
-        } else {
-            conexao = new ConexaoPostgreSQL();
-            comando = new ComandoPostgreSQL();
-        }
-        // Nada impede o engano abaixo (fornecedores misturados):
-        //   conexao = new ConexaoMySQL();
-        //   comando = new ComandoPostgreSQL();  // <- incoerência não detectada!
+    public AcessoDados(FabricaBanco fabrica) {
+        this.fabrica = fabrica;
+    }
+    public void conectar() {
+        Conexao conexao = fabrica.criarConexao();
+        Comando comando = fabrica.criarComando();
         conexao.abrir();
         comando.executar("SELECT * FROM aluno");
     }
+
 
     // PROBLEMA 2: método telescópico — muitos parâmetros opcionais.
     public String montarConsulta(String tabela, String filtro, String ordenacao,
@@ -56,5 +43,5 @@ public class AcessoDados {
         if (limite > 0) sb.append(" LIMIT ").append(limite);
         if (offset > 0) sb.append(" OFFSET ").append(offset);
         return sb.toString();
-    }
+    } 
 }
